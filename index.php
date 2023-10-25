@@ -412,6 +412,7 @@ $dotenv->load();
 
     #modal-content {
       background-color: hsl(246.46deg 20.83% 19.02%);
+      border-radius: 4px;
       width: 100%;
       max-width: 500px;
       padding: 20px;
