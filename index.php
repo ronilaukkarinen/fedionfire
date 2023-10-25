@@ -52,8 +52,9 @@ $dotenv->load();
 
     .top-bar {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
-      gap: 20px;
+      gap: 5px 20px;
       padding: 10px;
     }
 
@@ -90,7 +91,7 @@ $dotenv->load();
       height: 100vh;
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: 50px 4fr 0.1fr;
+      grid-template-rows: minmax(50px, auto) 4fr 0.1fr;
       gap: 0px 0px;
       grid-template-areas:
       "."
@@ -416,6 +417,7 @@ $dotenv->load();
       padding: 20px;
       position: relative;
       z-index: 2;
+      margin: 10px;
     }
 
     #modal-close {
