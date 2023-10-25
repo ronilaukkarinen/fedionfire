@@ -354,19 +354,30 @@ $dotenv->load();
       overflow: hidden;
     }
 
+    .author-info > p {
+      align-items: center;
+      display: flex;
+      gap: 10px;
+    }
+
     button.filter-now {
+      align-items: center;
       background-color: transparent;
       border-radius: 4px;
+      display: inline-flex;
       font-size: 12px;
-      padding: 7px 12px;
+      gap: 6px;
+      padding: 6px 12px;
       border: 1px solid rgba(255 255 255 / .2);
-      margin-left: 10px;
       font-weight: 400;
       color: var(--color-dim);
     }
 
-    button.filter-now:hover,
-    button.filter-now:focus {
+    button.filter-now .placeholder {
+      font-weight: 700;
+    }
+
+    button.filter-now:hover {
       border-color: rgba(255 255 255 / .5);
       color: var(--color-fg);
     }
@@ -385,7 +396,7 @@ $dotenv->load();
       height: 100%;
       cursor: pointer;
       background-color: hsl(0 0% 0% / 43%);
-      z-index: 0;
+      z-index: 1;
     }
 
     #modal {
@@ -399,29 +410,87 @@ $dotenv->load();
     }
 
     #modal-content {
-      background-color: hsl(240 4.6% 22%);
+      background-color: hsl(246.46deg 20.83% 19.02%);
       width: 100%;
       max-width: 500px;
+      padding: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    #modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 10px;
+      font-size: 20px;
+      line-height: 1;
+      background-color: transparent;
+      border: 0;
+      color: var(--color-dim);
+    }
+
+    #modal-close:hover {
+      color: var(--color-fg);
+    }
+
+    #modal-content label {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    #modal-content input {
+      width: calc(100% - 20px);
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255 255 255 / .2);
+      background-color: hsl(246.46deg 19.9% 12.6%);
+      color: var(--color-fg);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    #modal-content select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255 255 255 / .2);
+      background-color: hsl(246.46deg 19.9% 12.6%);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23f7f9f9' viewBox='0 0 16 16'%3E%3Cpath d='M8 10.586L4.707 7.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L8 10.586z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      color: var(--color-fg);
+      font-size: 14px;
+      margin-bottom: 10px;
+      -webkit-appearance: none;
+      appearance: none;
     }
 	</style>
 </head>
 <body>
 
 <!-- Accessible modal -->
-<div class="modal-overlay" aria-hidden="true" style="display: none;"></div>
 <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description" aria-hidden="true" style="display: none;">
+  <div id="modal-overlay" class="modal-overlay" aria-hidden="true" style="display: none;"></div>
   <div id="modal-content">
     <button id="modal-close" aria-label="Close modal" aria-controls="modal" type="button">✕</button>
 
-    <h2 style="font-weight: 400;">Choose what to show</h2>
+    <h2 style="font-weight: 400; margin-top: 0; margin-bottom: 19px;">Choose what to show</h2>
 
     <div id="modal-body">
-      <p>Modal body</p>
-
       <div id="filters">
         <form id="filterForm">
+          <label for="filter">
+            Filter
+          </label>
           <input id="filter" name="filter" type="text" pattern="[A-Za-z0-9\S]{1,25}" placeholder='e.g. keyword @user@someinstance.social (at least 3 letters)'>
+          <p class="text-help text-neutral">
+            Will show posts with any of your keywords. Currently searches for all open text, but no search parameters are supported like from: etc.
+          </p>
 
+          <label for="lang">
+            Language
+          </label>
           <select id="lang" name="lang">
             <option value="any" selected>Any Language</option>
             <option value="aa">Afaraf</option>
@@ -618,6 +687,15 @@ $dotenv->load();
             <option value="zbba">باليبلن</option>
             <option value="zggh">ⵜⴰⵎⴰⵣⵉⵖⵜ</option>
           </select>
+
+          <p class="text-help text-neutral">
+            Language detection in Mastodon is best-effort.
+          </p>
+
+          <!-- Reset button -->
+          <button id="reset" type="button" class="filter-now">
+            <span class="placeholder">Reset</span>
+          </button>
         </form>
       </div>
 
@@ -630,7 +708,7 @@ $dotenv->load();
 		<h1 style="margin: 0; line-height: 1; display: flex; align-items: center; gap: 4px;"; aria-label="Fedi on Fire"><svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path aria-hidden="true" fill="#f2610d" d="m17.66 11.2c-.23-.3-.51-.56-.77-.82-.67-.6-1.43-1.03-2.07-1.66-1.49-1.46-1.82-3.87-.87-5.72-.95.23-1.78.75-2.49 1.32-2.59 2.08-3.61 5.75-2.39 8.9.04.1.08.2.08.33 0 .22-.15.42-.35.5-.23.1-.47.04-.66-.12-.06-.05-.1-.1-.14-.17-1.13-1.43-1.31-3.48-.55-5.12-1.67 1.36-2.58 3.66-2.45 5.83.06.5.12 1 .29 1.5.14.6.41 1.2.71 1.73 1.08 1.73 2.95 2.97 4.96 3.22 2.14.27 4.43-.12 6.07-1.6 1.83-1.66 2.47-4.32 1.53-6.6l-.13-.26c-.21-.46-.77-1.26-.77-1.26m-3.16 6.3c-.28.24-.74.5-1.1.6-1.12.4-2.24-.16-2.9-.82 1.19-.28 1.9-1.16 2.11-2.05.17-.8-.15-1.46-.28-2.23-.12-.74-.1-1.37.17-2.06.19.38.39.76.63 1.06.77 1 1.98 1.44 2.24 2.8.04.14.06.28.06.43.03.82-.33 1.72-.93 2.27z"/></svg><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="125" height="16.08" viewBox="0 0 886 114"><path fill="currentColor" d="M6 55.5v51.6l15.8-.3 15.7-.3.3-17.7L38 71h47V47H38V29h53V4H6v51.5zM254 21.3c0 9.6-.3 17.7-.6 18-.4.3-1.5-.4-2.4-1.6-1-1.3-4.2-3.6-7.2-5.2-5-2.8-5.9-3-16.8-3-10.6 0-11.9.2-16.7 2.7-7.5 4-11.5 7.9-15.1 14.5-7.5 14.2-6.7 33.7 1.9 46.3 7 10.3 18.6 15.5 32.5 14.7 9.1-.5 15.1-2.7 20.6-7.6 4-3.5 4.8-2.9 4.8 3.5v3.5l14.8-.3 14.7-.3.3-51.3L285 4h-31v17.3zm-9 32.5c5.4 2.7 8 7.4 8 14.6 0 10.6-5.4 16-16 16-7 0-11.4-2.5-14-7.9-2.6-5.4-2.5-11.1.3-16.5 3.8-7.5 13.6-10.3 21.7-6.2zM295 13v9h31V4h-31v9zM595 55.5V107h32V71h48V47h-48.1l.3-8.8.3-8.7 26.8-.3L681 29V4h-86v51.5zM688 13v9h31V4h-31v9zM129.8 29.1C106.4 32.2 92 47.4 92 69c0 17 9.8 30 27.1 36.1 5.4 2 8.4 2.3 19.9 2.3 17.5.1 27.2-2.7 37.2-10.6 3.9-3 9.5-12.9 8.3-14.7-.4-.7-5.8-1.1-14.4-1.1-12.4 0-14 .2-15.6 2-2.5 2.8-8 4.4-15.1 4.3-8.7-.1-14.4-3.5-15.9-9.6l-.7-2.7h62.5l-.7-8c-2-23.7-15.8-36.4-41.6-38.3-3.6-.3-9.5-.1-13.2.4zM147 50.6c3.4 1.4 7 5.4 7 7.9 0 .3-7 .5-15.5.5-16.7 0-17.6-.3-13.4-4.9 4.7-5.1 14.2-6.6 21.9-3.5zM827 29c-22.8 2.8-36.8 16.4-37.8 37.1-1.2 24.9 14.3 40 42.8 41.6 11.2.6 23.3-1.3 31.5-5.1 9.3-4.2 17.5-13.4 17.5-19.5 0-2-.5-2.1-13.6-2.1-12.9 0-13.7.1-16.8 2.5-8.3 6.3-25.3 4.8-29.1-2.6-3.2-6.2-4.5-5.9 29-5.9H881v-6.8c0-27-22.1-43-54-39.2zm16.3 21.4c3.4 1.4 6 4 7 6.8.6 1.7-.6 1.8-15.4 1.8h-16l1.6-3.1c3.1-5.8 15.1-8.8 22.8-5.5zM393 30.6c-12.6 3.3-22.7 11.2-27.3 21.2-1.9 4-2.2 6.5-2.2 16.7 0 11.8.1 12.1 3.4 18.3 1.9 3.5 5.3 7.9 7.5 9.9 8.1 7.1 21.4 11.3 35.6 11.3 26.4 0 44.4-13.6 46.6-35 2.1-21.4-9.6-37.5-30.8-42.5-8-1.9-25.6-1.8-32.8.1zm24.9 23.2c5 2.5 7.4 6.3 7.9 12.6.3 4.2-.1 6.5-1.7 9.9-2.7 5.6-6.8 7.7-14.8 7.7-6.9 0-11.4-2.3-13.9-7.2-2.3-4.4-2.2-13.7.2-17.7 3.7-6.3 15.1-9 22.3-5.3zM514.4 29.9c-5.5 1.3-12.3 5.1-15 8.4-1.5 1.8-3 3.2-3.3 3.2-.3 0-.8-2.5-1.1-5.5l-.5-5.5-14.7-.3-14.8-.3V107h31V85.2c0-25.2.5-27 8.1-31 5.1-2.7 11.9-2.4 15.2.6 4.2 3.7 4.7 7 4.7 30.2v22h31V81.7c0-27.5-.8-33.2-5.5-40.7-5.9-9.4-21.6-14.3-35.1-11.1zM295.2 68.2l.3 38.3 15.3.3 15.2.3V30h-31l.2 38.2zM688 68.5v38.6l15.3-.3 15.2-.3.3-38.3.2-38.2h-31v38.5zM729.7 30.6c-.4.4-.7 17.8-.7 38.6V107h31V90.2c0-9.2.5-18.7 1.1-21.2 1.9-8.3 7.7-12 18.7-12h5.2V30h-6.1c-7.4 0-11.8 1.9-16.3 7.1-1.8 2.2-3.6 3.9-3.9 3.9-.3 0-.7-2.4-.9-5.3l-.3-5.2-13.6-.3c-7.4-.1-13.8.1-14.2.4z"/></svg><span class="beta">beta</span></h1>
 
     <div class="author-info">
-      <p>👀 the <a href="https://jointhefediverse.net">Fediverse</a> firehose. Filtering coming soon. <span id="filter-title"></span></p>
+      <p><span>👀 the <a href="https://jointhefediverse.net">Fediverse</a> firehose.</span><span id="filter-title"><button id="filter-now" class="filter-now" type="button"><svg aria-hidden="true" style="pointer-events: none;" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span> <span class="placeholder">Filter</span></p>
     </div>
 	</header>
 
@@ -814,7 +892,7 @@ window.addEventListener('load', function(event) {
 		localStorage["lastLang"] = lang;
 		document.getElementById("filters").classList.add("hidden");
 		document.getElementById("stream").classList.remove("hidden");
-		document.getElementById("filter-title").innerHTML = '<button class="filter-now" type="button">Now filtering: <span class="hilight">' + filter + '</span></button>';
+		document.getElementById("filter-now").innerHTML = 'Now filtering: <span class="hilight">' + filter + '</span>';
 	} else {
 
     // Stream by default without a filter
@@ -841,7 +919,7 @@ document.getElementById("filter").addEventListener('keyup', function(event) {
     var lang = document.getElementById("lang").value.toLowerCase();
 
     // Update placeholder
-    document.getElementById("filter-title").innerHTML = '<button class="filter-now" type="button">Now filtering: <span class="hilight">' + filter + '</span></button>';
+    document.getElementById("filter-now").innerHTML = 'Now filtering: <span class="hilight">' + filter + '</span>';
 
     // Push state to URL
     history.pushState(null, null, '?filter=' + filter + '&lang=' + lang);
@@ -856,6 +934,73 @@ document.getElementById("filter").addEventListener('keyup', function(event) {
 
     console.log('Updated filter: ' + filter);
   }, 800);
+});
+
+// Accessible open modal when pressing filter-now button
+document.getElementById("filter-now").addEventListener('click', function(event) {
+
+  // Set display to modal overlay
+  document.getElementById("modal-overlay").style.display = "block";
+
+  // Set display to modal
+  document.getElementById("modal").style.display = "flex";
+
+  // Focus to filter input
+  document.getElementById("filter").focus();
+
+  // Set aria-hidden to false
+  document.getElementById("modal").setAttribute("aria-hidden", "false");
+
+});
+
+// Close modal with esc and modal-close button
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    document.getElementById("modal-overlay").style.display = "none";
+    document.getElementById("modal").style.display = "none";
+    document.getElementById("modal").setAttribute("aria-hidden", "true");
+
+    // Move focus back to filter button
+    document.getElementById("filter-now").focus();
+  }
+});
+
+document.getElementById("modal-close").addEventListener('click', function(event) {
+  document.getElementById("modal-overlay").style.display = "none";
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("modal").setAttribute("aria-hidden", "true");
+
+  // Move focus back to filter button
+  document.getElementById("filter-now").focus();
+});
+
+// Reset button
+document.getElementById("reset").addEventListener('click', function(event) {
+  document.getElementById("filter").value = '';
+  document.getElementById("lang").value = 'any';
+  document.getElementById("filter-now").innerHTML = 'Filter';
+  document.getElementById("modal-overlay").style.display = "none";
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("modal").setAttribute("aria-hidden", "true");
+
+  // Move focus back to filter button
+  document.getElementById("filter-now").focus();
+
+  // Push state to URL
+  history.pushState(null, null, '?filter=&lang=any');
+
+  // Reload page
+  location.reload();
+});
+
+// Hide modal when clicking outside of it
+document.getElementById("modal-overlay").addEventListener('click', function(event) {
+  document.getElementById("modal-overlay").style.display = "none";
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("modal").setAttribute("aria-hidden", "true");
+
+  // Move focus back to filter button
+  document.getElementById("filter-now").focus();
 });
 
 </script>
