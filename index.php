@@ -467,6 +467,10 @@ $dotenv->load();
       -webkit-appearance: none;
       appearance: none;
     }
+
+    #filters p {
+      margin: 0 0 19px;
+    }
 	</style>
 </head>
 <body>
@@ -886,14 +890,19 @@ filterText = document.getElementById("filter").value.toLowerCase();
 // When page is loaded, check for query string, otherwise present input
 window.addEventListener('load', function(event) {
 
+  // If lang is set, select the current lang in the dropdown and set it to the button
+  if (getUrlParameter('lang')) {
+    document.getElementById("lang").value = getUrlParameter('lang');
+  }
+
 	// Grab URL parameters if they exist
 	var filter = getUrlParameter('filter') ? getUrlParameter('filter') : false;
 	var lang = getUrlParameter('lang') ? getUrlParameter('lang') : "any";
 
 	if (filter) {
+    document.getElementById("filter").value = filter;
 		localStorage["lastLang"] = lang;
-		document.getElementById("filters").classList.add("hidden");
-		document.getElementById("stream").classList.remove("hidden");
+
 		document.getElementById("filter-now").innerHTML = 'Now filtering: <span class="hilight">' + filter + '</span>';
 	} else {
 
@@ -904,6 +913,11 @@ window.addEventListener('load', function(event) {
 			document.getElementById("lang").value = localStorage["lastLang"];
 		}
 	}
+
+  // If lang, add it to the button
+  if (lang != "any") {
+    document.getElementById("filter-now").innerHTML += ' <span class="text-neutral">(' + lang + ')</span>';
+  }
 
 	beginStreaming(filter, lang);
 });
@@ -926,8 +940,6 @@ document.getElementById("filter").addEventListener('keyup', function(event) {
     // Push state to URL
     history.pushState(null, null, '?filter=' + filter + '&lang=' + lang);
     console.log('Filtering for: ' + filter);
-
-    console.log('Searching for: ' + filter);
   }, 500);
 
   setTimeout(function() {
@@ -935,6 +947,36 @@ document.getElementById("filter").addEventListener('keyup', function(event) {
     lang = document.getElementById("lang").value.toLowerCase();
 
     console.log('Updated filter: ' + filter);
+  }, 800);
+});
+
+// Do the same when selecting language
+document.getElementById("lang").addEventListener('change', function(event) {
+
+  var lang = document.getElementById("lang").value.toLowerCase();
+  console.log('Changed language to: ' + lang);
+
+  filter = document.getElementById("filter").value.toLowerCase();
+
+  // Change only lang in the address bar, leave filter as is
+  history.pushState(null, null, '?filter=' + filter + '&lang=' + lang);
+
+  lang = document.getElementById("lang").value.toLowerCase();
+  console.log('Updated language: ' + lang);
+
+  // If lang, add it to the button
+  if (lang != "any") {
+    document.getElementById("filter-now").innerHTML += ' <span class="text-neutral">(' + lang + ')</span>';
+  } else {
+    document.getElementById("filter-now").innerHTML = 'Now filtering: <span class="hilight">' + filter + '</span>';
+  }
+
+  setTimeout(function() {
+    filter = document.getElementById("filter").value.toLowerCase();
+    lang = document.getElementById("lang").value.toLowerCase();
+
+    console.log('Updated filter: ' + filter);
+    console.log('Updated language: ' + lang);
   }, 800);
 });
 
@@ -952,7 +994,6 @@ document.getElementById("filter-now").addEventListener('click', function(event) 
 
   // Set aria-hidden to false
   document.getElementById("modal").setAttribute("aria-hidden", "false");
-
 });
 
 // Close modal with esc and modal-close button
