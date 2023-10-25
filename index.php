@@ -2,8 +2,8 @@
 // Require composer
 require __DIR__ . '/vendor/autoload.php';
 
-// Set up phpdotenv
-$dotenv = \Dotenv\Dotenv::createImmutable( __DIR__ );
+// Get .env from one directory up
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 ?>
 <!doctype html>
