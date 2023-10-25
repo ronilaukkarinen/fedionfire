@@ -695,7 +695,7 @@ $dotenv->load();
           </select>
 
           <p class="text-help text-neutral">
-            Language detection in Mastodon is best-effort.
+            Language detection in Mastodon is best-effort. (Partial on BETA. Feature coming soon, currently only works with URL parameter)
           </p>
 
           <!-- Reset button -->
