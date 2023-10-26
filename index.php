@@ -736,7 +736,7 @@ $dotenv->load();
 
 <template id="statusTemplate">
 
-  <a href="${status.account.url}" target="_blank" class="text-right">
+  <a href="${status.account.url}" target="_blank" class="text-right" data-id="${status.id}">
     <span class="text-truncate text-normal text-block name">
       ${status.account.display_name}
     </span>
@@ -746,11 +746,11 @@ $dotenv->load();
     </span>
   </a>
 
-  <div class="avatar" style="justify-content: center;">
+  <div class="avatar" style="justify-content: center;" data-id="${status.id}">
     <img src="${status.account.avatar_static}" alt="">
   </div>
 
-  <div class="target">
+  <div class="target" data-id="${status.id}">
     <a href="${status.url}" target="_blank" class="global-link break-words text-clip overflow-x-clip" aria-hidden="true" tabindex="-1"></a>
 
     <span class="whitespace-pre-line">${status.content}</span>
@@ -865,6 +865,11 @@ function beginStreaming(filter, lang) {
 			anchor.insertAdjacentHTML('beforebegin', statusHTML);
 		}
 	});
+
+  // Remove status if it's deleted
+  evtSource.addEventListener("delete", (event) => {
+    document.querySelectorAll(`[data-id="${event.data}"]`).forEach((el) => el.remove());
+  });
 }
 
 // If statuses div is not scrolled to bottom, show button, otherwise hide
