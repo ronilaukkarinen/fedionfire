@@ -866,6 +866,21 @@ function beginStreaming(filter, lang) {
 		}
 	});
 
+  // Update status if it gets updated
+  evtSource.addEventListener("status.update", (event) => {
+    var status = JSON.parse(event.data);
+
+    if (!document.querySelector(`[data-id="${status.id}"]`)) return; // Status isn't rendered (filtered out or just too old)
+    console.log(status.id);
+    // Remove divs
+    document.querySelectorAll(`div[data-id="${status.id}"]`).forEach((el) => el.remove());
+
+    // Replace anchor tag with new HTML
+    const anchor = document.querySelector(`a[data-id="${status.id}"]`);
+
+    anchor.outerHTML = statusToHtml(status);
+  });
+
   // Remove status if it's deleted
   evtSource.addEventListener("delete", (event) => {
     document.querySelectorAll(`[data-id="${event.data}"]`).forEach((el) => el.remove());
