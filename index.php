@@ -9,8 +9,8 @@ $dotenv->load();
 <!doctype html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:title" content="Fedi on Fire!">
   <meta property="og:description" content="Watch every Mastodon/Fediverse post in real-time - filter the firehose">
   <meta property="og:type" content="website">
@@ -19,9 +19,10 @@ $dotenv->load();
   <meta name="twitter:card" content="summary_large_image">
   <meta name="title" content="Fedi on Fire!">
   <meta name="description" content="Watch every Mastodon/Fediverse post in real-time - filter the firehose">
-	<title>Fedi on Fire</title>
+  <title>Fedi on Fire</title>
   <link rel="icon" href="dynamic-favicon.svg">
-	<style>
+  <script defer data-domain="fedionfire.stream" src="https://analytics.dude.fi/js/script.js"></script>
+  <style>
     :root {
       --color-bg: #1e2028;
       --color-fg: #f7f9f9;
