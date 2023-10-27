@@ -1,3 +1,7 @@
+### 0.0.4: 2023-10-27
+
+* Mobile responsiveness
+
 ### 0.0.3: 2023-10-27
 
 * Fix regression with updating the status #5
