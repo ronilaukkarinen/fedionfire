@@ -101,17 +101,21 @@ $dotenv->load();
     }
 
     #statuses {
+      height: calc(100vh - (calc(70px * 2)));
+      min-height: calc(100vh - (calc(70px * 2)));
+      max-height: calc(100vh - (calc(70px * 2)));
+      max-width: 100vw;
+      overflow-y: scroll;
+      overflow-x: hidden;
+    }
+
+    .status {
+      gap: 10px;
       grid-auto-rows: max-content;
       grid-auto-flow: row;
       grid-template-columns: 20rem 2rem 1fr;
       display: grid;
-      min-height: calc(100vh - (calc(70px * 2)));
-      max-height: calc(100vh - (calc(70px * 2)));
-      height: calc(100vh - (calc(70px * 2)));
-      max-width: 100vw;
-      overflow-y: scroll;
-      overflow-x: hidden;
-      gap: 10px;
+      margin-top: 10px;
     }
 
     @media (max-width: 600px) {
@@ -119,6 +123,7 @@ $dotenv->load();
         grid-template-columns: 7rem 3rem 1fr;
       }
 
+      .version,
       .bottom-bar p,
       .top-bar p {
         font-size: 11px;
@@ -167,6 +172,7 @@ $dotenv->load();
       align-items: center;
     }
 
+    .version,
     .bottom-bar p {
       margin: 0;
       color: var(--color-dim);
@@ -184,6 +190,8 @@ $dotenv->load();
     }
 
     .live-indicator-block {
+      align-items: center;
+      gap: 10px;
       display: inline-flex;
       min-width: 50.73px;
     }
@@ -728,38 +736,52 @@ $dotenv->load();
 
   <footer class="bottom-bar">
     <div class="repo-info">
+      <?php
+        // Get version from GitHub repo tag
+        $url = 'https://api.github.com/repos/ronilaukkarinen/fedionfire/tags';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Fedi on Fire');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $tags = json_decode($response, true);
+        $version = $tags[0]['name'];
+      ?>
       <p>Fedi on Fire built by <a href="https://github.com/ronilaukkarinen">Roni Laukkarinen</a>, based on fedistream gist by <a href="https://github.com/ummjackson" target="_blank">Jackson Palmer</a>, inspired by <a href="https://firesky.tv">firesky.tv</a> and <a href="https://github.com/cscape/mastodon-firehose">mastodon-firehose</a>. <a href="https://github.com/ronilaukkarinen/fedionfire">View code</a></p>
     </div>
-    <div class="live-indicator-block"><span class="live-indicator"><span class="circle blink" aria-hidden="true"></span>Live</span></div>
+    <div class="live-indicator-block"><span class="version">Running v<?php echo $version; ?></span><span class="live-indicator"><span class="circle blink" aria-hidden="true"></span>Live</span></div>
   </footer>
 </main>
 
 <template id="statusTemplate">
 
-  <a href="${status.account.url}" target="_blank" class="text-right" data-id="${status.id}">
-    <span class="text-truncate text-normal text-block name">
-      ${status.account.display_name}
-    </span>
+  <div class="status" data-id="${status.id}">
+    <a class="text-right" href="${status.account.url}" target="_blank">
+      <span class="text-truncate text-normal text-block name">
+        ${status.account.display_name}
+      </span>
 
-    <span class="text-xs text-block text-neutral">
-      ${status.account.acct}
-    </span>
-  </a>
+      <span class="text-xs text-block text-neutral">
+        ${status.account.acct}
+      </span>
+    </a>
 
-  <div class="avatar" style="justify-content: center;" data-id="${status.id}">
-    <img src="${status.account.avatar_static}" alt="">
-  </div>
+    <div class="avatar" style="justify-content: center;">
+      <img src="${status.account.avatar_static}" alt="">
+    </div>
 
-  <div class="target" data-id="${status.id}">
-    <a href="${status.url}" target="_blank" class="global-link break-words text-clip overflow-x-clip" aria-hidden="true" tabindex="-1"></a>
+    <div class="target">
+      <a href="${status.url}" target="_blank" class="global-link break-words text-clip overflow-x-clip" aria-hidden="true" tabindex="-1"></a>
 
-    <span class="whitespace-pre-line">${status.content}</span>
-    <span class="text-block">
-      ${status.media_attachments}
-      <p class="screen-reader-text">
-        <a href="${status.url}" target="_blank" class="break-words text-clip overflow-x-clip" aria-hidden="true" tabindex="-1">Link to status</a>
-      </p>
-    </span>
+      <span class="whitespace-pre-line">${status.content}</span>
+      <span class="text-block">
+        ${status.media_attachments}
+        <p class="screen-reader-text">
+          <a href="${status.url}" target="_blank" class="break-words text-clip overflow-x-clip" aria-hidden="true" tabindex="-1">Link to status</a>
+        </p>
+      </span>
+    </div>
   </div>
 
 </template>
@@ -866,24 +888,34 @@ function beginStreaming(filter, lang) {
 		}
 	});
 
+  // Remove status if it's deleted
+  evtSource.addEventListener("delete", (event) => {
+    document.querySelectorAll(`[data-id="${event.data}"]`).forEach((el) => el.remove());
+
+    // Log
+    console.log('Status deleted: ' + event.data);
+  });
+
   // Update status if it gets updated
   evtSource.addEventListener("status.update", (event) => {
     var status = JSON.parse(event.data);
 
-    if (!document.querySelector(`[data-id="${status.id}"]`)) return; // Status isn't rendered (filtered out or just too old)
-    console.log(status.id);
-    // Remove divs
-    document.querySelectorAll(`div[data-id="${status.id}"]`).forEach((el) => el.remove());
+    const updatedStatus = document.querySelector(`[data-id="${status.id}"]`);
 
-    // Replace anchor tag with new HTML
-    const anchor = document.querySelector(`a[data-id="${status.id}"]`);
+    // If updatedStatus does not exist, return
+    if (!updatedStatus) {
+      return;
+    }
 
-    anchor.outerHTML = statusToHtml(status);
-  });
+    // Update content
+    document.querySelector(`[data-id="${status.id}"] .target .whitespace-pre-line`).innerHTML = status.content;
 
-  // Remove status if it's deleted
-  evtSource.addEventListener("delete", (event) => {
-    document.querySelectorAll(`[data-id="${event.data}"]`).forEach((el) => el.remove());
+    // Add orange border to updated status
+    document.querySelector(`[data-id="${status.id}"] .target .whitespace-pre-line`).outerHTML = '<span class="whitespace-pre-line" style="display: inline-block; border-left: 2px solid #f2610d; padding-left: 10px;">[updated]</span> ' + status.content;
+
+    // Log
+    console.log('Status updated: ' + status.id);
+
   });
 }
 
