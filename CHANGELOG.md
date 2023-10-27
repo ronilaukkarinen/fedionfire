@@ -5,7 +5,7 @@
 * Check if user doesn not want to be found
 * If display name is undefined, replace it with username
 * Hotfix language selector
-* Remove from other end afte 50 statuses
+* Remove from other end after 50 statuses
 
 ### 0.0.4: 2023-10-27
 
