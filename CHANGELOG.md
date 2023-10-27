@@ -1,3 +1,12 @@
+### 0.9.0: 2023-10-28
+
+* Check for nonexistent emojis
+* Check for nonexistent statuses
+* Check if user doesn not want to be found
+* If display name is undefined, replace it with username
+* Hotfix language selector
+* Remove from other end afte 50 statuses
+
 ### 0.0.4: 2023-10-27
 
 * Mobile responsiveness

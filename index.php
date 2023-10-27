@@ -1,4 +1,7 @@
 <?php
+// Set version
+$version = '0.9.0';
+
 // Require composer
 require __DIR__ . '/vendor/autoload.php';
 
@@ -756,18 +759,6 @@ $dotenv->load();
 
   <footer class="bottom-bar">
     <div class="repo-info">
-      <?php
-        // Get version from GitHub repo tag
-        $url = 'https://api.github.com/repos/ronilaukkarinen/fedionfire/tags';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Fedi on Fire');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        $tags = json_decode($response, true);
-        $version = $tags[0]['name'];
-      ?>
       <p>Fedi on Fire built by <a href="https://github.com/ronilaukkarinen">Roni Laukkarinen</a>, based on fedistream gist by <a href="https://github.com/ummjackson" target="_blank">Jackson Palmer</a>, inspired by <a href="https://firesky.tv">firesky.tv</a> and <a href="https://github.com/cscape/mastodon-firehose">mastodon-firehose</a>. <a href="https://github.com/ronilaukkarinen/fedionfire">View code</a></p>
     </div>
     <div class="live-indicator-block"><span class="version">Running <a href="https://github.com/ronilaukkarinen/fedionfire">v<?php echo $version; ?></a></span><span class="live-indicator"><span class="circle blink" aria-hidden="true"></span>Live</span></div>
@@ -831,6 +822,10 @@ function customEmojis(str, emojis) {
 
   var emojiMap = {};
 
+  if (!emojis) {
+    return str;
+  }
+
   emojis.forEach(emoji => {
 	emojiMap[':' + emoji.shortcode + ':'] = '<img src="' + emoji.url + '" draggable="false" class="emoji"/>';
   });
@@ -844,7 +839,7 @@ function customEmojis(str, emojis) {
 }
 
 // Set event source
-const evtSource = new EventSource("https://mastodon.social/api/v1/streaming/public?access_token=<?php echo $_ENV['MASTODONSOCIAL_ACCESS_TOKEN']; ?>");
+const evtSource = new EventSource("https://corsproxy.io/?https%3A%2F%2Ffedi.buzz%2Fapi%2Fv1%2Fstreaming%2Fpublic");
 
 // Main streaming function
 function beginStreaming(filter, lang) {
@@ -853,12 +848,46 @@ function beginStreaming(filter, lang) {
 
 	evtSource.addEventListener("update", (event) => {
 
+    // Calculate amount of updates based on the amount of status divs
+    var updates = document.querySelectorAll('.status').length;
+    console.log('Updates: ' + updates);
+
+    // When there's certain amount of updates, start removing from the top
+    if (updates >= 50) {
+      document.querySelector('.status:first-child').remove();
+    }
+
     // If filter is set to the input field, use that one
     if (document.getElementById("filter").value) {
       filter = document.getElementById("filter").value.toLowerCase();
     }
 
 		var status = JSON.parse(event.data);
+
+    // If status content does not exist
+    if (!status.content) {
+      return;
+    }
+
+    // If display name is undefined, replace it with username
+    if (!status.account.display_name) {
+      status.account.display_name = status.account.username;
+    }
+
+    // If anything under status is undefined
+    if (!status.account.acct || !status.account.url || !status.account.avatar_static) {
+      return;
+    }
+
+    // If user name is undefined
+    if (!status.account.username) {
+      return;
+    }
+
+    // If link not found
+    if (!status.url) {
+      return;
+    }
 
     // Constantly calculate the height in total of the avatars inside statuses div
     var contentHeight = 0;
@@ -920,6 +949,14 @@ function beginStreaming(filter, lang) {
   evtSource.addEventListener("status.update", (event) => {
     var status = JSON.parse(event.data);
 
+    // Log
+    console.log('Status updated: ' + status.id);
+
+    // If status content does not exist
+    if (!status.content) {
+      return;
+    }
+
     const updatedStatus = document.querySelector(`[data-id="${status.id}"]`);
 
     // If updatedStatus does not exist, return
@@ -932,10 +969,6 @@ function beginStreaming(filter, lang) {
 
     // Add orange border to updated status
     document.querySelector(`[data-id="${status.id}"] .target .whitespace-pre-line`).outerHTML = '<span class="whitespace-pre-line" style="display: inline-block; border-left: 2px solid #f2610d; padding-left: 10px;">[updated]</span> ' + status.content;
-
-    // Log
-    console.log('Status updated: ' + status.id);
-
   });
 }
 
@@ -990,7 +1023,7 @@ window.addEventListener('load', function(event) {
 
   // If lang, add it to the button
   if (lang != "any") {
-    document.getElementById("filter-now").innerHTML += ' <span class="text-neutral">(' + lang + ')</span>';
+    document.getElementById("filter-now").innerHTML += '<span class="text-neutral">(' + lang + ')</span>';
   }
 
 	beginStreaming(filter, lang);
@@ -1040,7 +1073,7 @@ document.getElementById("lang").addEventListener('change', function(event) {
 
   // If lang, add it to the button
   if (lang != "any") {
-    document.getElementById("filter-now").innerHTML += ' <span class="text-neutral">(' + lang + ')</span>';
+    document.getElementById("filter-now").innerHTML += '<span class="text-neutral">(' + lang + ')</span>';
   } else {
     document.getElementById("filter-now").innerHTML = 'Now filtering: <span class="hilight">' + filter + '</span>';
   }
@@ -1049,8 +1082,16 @@ document.getElementById("lang").addEventListener('change', function(event) {
     filter = document.getElementById("filter").value.toLowerCase();
     lang = document.getElementById("lang").value.toLowerCase();
 
+    // Change selected language in <select>
+    document.getElementById("lang").value = lang;
+
+
     console.log('Updated filter: ' + filter);
     console.log('Updated language: ' + lang);
+
+    // Reload page while retaining URL
+    window.location.reload(false);
+
   }, 800);
 });
 
