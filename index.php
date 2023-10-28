@@ -759,7 +759,7 @@ $dotenv->load();
 
   <footer class="bottom-bar">
     <div class="repo-info">
-      <p>Fedi on Fire built by <a href="https://github.com/ronilaukkarinen">Roni Laukkarinen</a>, based on fedistream gist by <a href="https://github.com/ummjackson" target="_blank">Jackson Palmer</a>, inspired by <a href="https://firesky.tv">firesky.tv</a> and <a href="https://github.com/cscape/mastodon-firehose">mastodon-firehose</a>. <a href="https://github.com/ronilaukkarinen/fedionfire">View code</a></p>
+      <p>Fedi on Fire built by <a href="https://github.com/ronilaukkarinen">Roni Laukkarinen</a>, inspired by <a href="https://firesky.tv">firesky.tv</a>. <a href="https://github.com/ronilaukkarinen/fedionfire">View code</a> - <a href="https://github.com/ronilaukkarinen/fedionfire/blob/master/PRIVACY.md">Privacy policy</a></p>
     </div>
     <div class="live-indicator-block"><span class="version">Running <a href="https://github.com/ronilaukkarinen/fedionfire">v<?php echo $version; ?></a></span><span class="live-indicator"><span class="circle blink" aria-hidden="true"></span>Live</span></div>
   </footer>

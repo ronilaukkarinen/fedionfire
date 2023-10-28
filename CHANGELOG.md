@@ -1,6 +1,7 @@
 ### 0.9.1: 2023-10-28
 
 * Retain srollability when the posts are deleted after limit is reached
+* Add privacy policy
 
 ### 0.9.0: 2023-10-28
 
