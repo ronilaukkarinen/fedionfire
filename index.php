@@ -373,6 +373,10 @@ $dotenv->load();
       color: var(--color-dim);
     }
 
+    button.filter-now p:empty {
+      display: none;
+    }
+
     button.filter-now .placeholder {
       font-weight: 700;
     }
