@@ -187,7 +187,6 @@ $dotenv->load();
     }
 
     .live-indicator-block .live-indicator {
-      min-width: 50.73px;
       background: #ea2429;
       border-radius: 6px;
       color: #fff;

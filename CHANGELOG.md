@@ -2,6 +2,7 @@
 
 * Retain srollability when the posts are deleted after limit is reached
 * Add privacy policy
+* Fix the width of the live indicator
 
 ### 0.9.0: 2023-10-28
 
