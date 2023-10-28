@@ -1,6 +1,6 @@
 <?php
 // Set version
-$version = '0.9.0';
+$version = '0.9.1';
 
 // Require composer
 require __DIR__ . '/vendor/autoload.php';
@@ -853,7 +853,8 @@ function beginStreaming(filter, lang) {
     console.log('Updates: ' + updates);
 
     // When there's certain amount of updates, start removing from the top
-    if (updates >= 50) {
+    // ..and if we're scrolled to bottom
+    if (updates >= 50 && statusesContainer.scrollTop >= statusesContainer.scrollHeight - statusesContainer.offsetHeight) {
       document.querySelector('.status:first-child').remove();
     }
 
