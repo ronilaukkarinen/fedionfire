@@ -16,7 +16,7 @@ We do not collect, save or process ANY Personal Information. "Personal Informati
 
 #### Non-personal information
 
-Wedo not collect, save or process ANY Non-Personal Information about users. Non-Personal Information may include the information about your devices, such as the versions of phone model and other similar information.
+We do not collect, save or process ANY Non-Personal Information about users. Non-Personal Information may include the information about your devices, such as the versions of phone model and other similar information.
 
 ### 2. How we use information
 
