@@ -1,6 +1,6 @@
 <?php
 // Set version
-$version = '0.9.1';
+$version = '1.0.0';
 
 // Require composer
 require __DIR__ . '/vendor/autoload.php';
@@ -13,7 +13,7 @@ $dotenv->load();
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
   <meta property="og:title" content="Fedi on Fire!">
   <meta property="og:description" content="Watch every Mastodon/Fediverse post in real-time - filter the firehose">
   <meta property="og:type" content="website">
@@ -93,9 +93,10 @@ $dotenv->load();
 
     #stream {
       height: 100vh;
+      height: 100svh;
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: minmax(50px, auto) 4fr 0.1fr;
+      grid-template-rows: minmax(50px, 50px) 4fr minmax(50px, 50px);
       gap: 0px 0px;
       grid-template-areas:
       "."
@@ -104,12 +105,21 @@ $dotenv->load();
     }
 
     #statuses {
-      height: calc(100vh - (calc(70px * 2)));
-      min-height: calc(100vh - (calc(70px * 2)));
-      max-height: calc(100vh - (calc(70px * 2)));
+      height: calc(100vh - 100px);
+      height: calc(100svh - 100px);
+      max-height: calc(100vh - 100px);
+      min-height: calc(100vh - 100px);
+      min-height: calc(100svh - 100px);
       max-width: 100vw;
       overflow-y: scroll;
       overflow-x: hidden;
+    }
+
+    /* On mobile Safari */
+    @supports (-webkit-touch-callout: none) {
+      #catch-up-container {
+        display: none !important;
+      }
     }
 
     .status {
@@ -915,6 +925,14 @@ function beginStreaming(filter, lang) {
     // When height of content reach the height of the window, scroll to bottom but not until it's double over the window height
     if (contentHeight >= window.innerHeight - 400 && contentHeight <= window.innerHeight * 1.5) {
       statusesContainer.scrollTop = statusesContainer.scrollHeight;
+    }
+
+    // If Safari, always scroll to bottom
+    if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+      statusesContainer.scrollTop = statusesContainer.scrollHeight;
+
+      // Always hide catch-up button
+      document.getElementById("catch-up-container").hidden = true;
     }
 
 		// Remove HTML tags and URLs from status content for search purposes

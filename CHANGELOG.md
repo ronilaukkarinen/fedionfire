@@ -1,7 +1,7 @@
 ### 1.0.0: 2023-10-31
 
 * Mobile Safari compatibility
-* Repsonsive fixes
+* Repsonsive fixes for mobile Safari
 
 ### 0.9.1: 2023-10-28
 
