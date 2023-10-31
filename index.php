@@ -125,9 +125,21 @@ $dotenv->load();
       overflow-anchor: none;
     }
 
+    #catch-up-container {
+      bottom: 60px;
+      justify-content: center;
+      display: flex;
+      position: absolute;
+      width: 100vw;
+    }
+
+    #catch-up-container[hidden] {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
     #catch-up {
-      align-self: end;
-      justify-self: center;
       background-color: var(--color-mastodon-light);
       border-radius: 4px;
       color: #fff;
@@ -135,8 +147,6 @@ $dotenv->load();
       padding: 10px 12px;
       border: 0;
       font-weight: 700;
-      position: absolute;
-      bottom: 60px;
     }
 
     #catch-up:hover {
@@ -758,7 +768,9 @@ $dotenv->load();
     <div id="anchor"></div>
 	</div>
 
-  <button id="catch-up" hidden type="button">↓ Catch up ↓</button>
+  <div id="catch-up-container" hidden>
+    <button id="catch-up" type="button">↓ Catch up ↓</button>
+  </div>
 
   <footer class="bottom-bar">
     <div class="repo-info">
@@ -980,11 +992,11 @@ function beginStreaming(filter, lang) {
 statusesContainer.addEventListener('scroll', function(event) {
   // Add safe zone to bottom of div
   if (statusesContainer.scrollTop < statusesContainer.scrollHeight - statusesContainer.offsetHeight - 200) {
-    document.getElementById("catch-up").hidden = false;
+    document.getElementById("catch-up-container").hidden = false;
   }
 
   else {
-    document.getElementById("catch-up").hidden = true;
+    document.getElementById("catch-up-container").hidden = true;
   }
 });
 
@@ -993,7 +1005,7 @@ document.getElementById("catch-up").addEventListener('click', function(event) {
   statusesContainer.scrollTop = statusesContainer.scrollHeight;
 
   // Hide button
-  document.getElementById("catch-up").hidden = true;
+  document.getElementById("catch-up-container").hidden = true;
 });
 
 filterText = document.getElementById("filter").value.toLowerCase();
