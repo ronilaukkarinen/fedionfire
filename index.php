@@ -1,6 +1,6 @@
 <?php
 // Set version
-$version = '1.0.0';
+$version = '1.0.1';
 
 // Require composer
 require __DIR__ . '/vendor/autoload.php';
@@ -943,7 +943,7 @@ function beginStreaming(filter, lang) {
     }
 
 		// Check for filter text in content & that language is either set to "any" or a match
-		if (statusText.toLowerCase().includes(filter) && (lang.toLowerCase() == "any" || status.language.toLowerCase().includes(lang.toLowerCase()))) {
+		if (status.language && statusText.toLowerCase().includes(filter) && (lang.toLowerCase() == "any" || status.language.toLowerCase().includes(lang.toLowerCase()))) {
 
 			// Emojify content
 			status.content = customEmojis(status.content, status.emojis);
@@ -957,7 +957,7 @@ function beginStreaming(filter, lang) {
 			status.account.display_name = customEmojis(status.account.display_name, status.account.emojis);
 
 			// Convert created_at to local timestamp
-			status.created_at = new Date(status.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+			// status.created_at = new Date(status.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
       // Reply indicator
       if (status.in_reply_to_id != null) {
@@ -973,9 +973,9 @@ function beginStreaming(filter, lang) {
 
       // console.log('Status added: ' + status.content);
 
-      // Render status
-			statusHTML = interpolate(statusTemplate, {status});
-			anchor.insertAdjacentHTML('beforebegin', statusHTML);
+      // Build template
+      statusHTML = interpolate(statusTemplate, {status});
+      anchor.insertAdjacentHTML('beforebegin', statusHTML);
 		}
 	});
 
@@ -1068,7 +1068,7 @@ window.addEventListener('load', function(event) {
     document.getElementById("filter-now").innerHTML += '<span class="text-neutral">(' + lang + ')</span>';
   }
 
-	beginStreaming(filter, lang);
+  beginStreaming(filter, lang);
 });
 
 // Filter on type without enter, add with push state to URL

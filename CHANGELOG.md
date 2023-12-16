@@ -1,3 +1,8 @@
+### 1.0.1: 2023-12-16
+
+* Fix error with filtering by language
+* Truncate long statuses
+
 ### 1.0.0: 2023-10-31
 
 * Mobile Safari compatibility
