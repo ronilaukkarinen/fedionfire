@@ -1,6 +1,6 @@
 <?php
 // Set version
-$version = '1.0.1';
+$version = '1.0.2';
 
 // Require composer
 require __DIR__ . '/vendor/autoload.php';
@@ -864,7 +864,12 @@ function customEmojis(str, emojis) {
 }
 
 // Set event source
-const evtSource = new EventSource("https://corsproxy.io/?https%3A%2F%2Ffedi.buzz%2Fapi%2Fv1%2Fstreaming%2Fpublic");
+
+// Not always reliable
+//const evtSource = new EventSource("https://corsproxy.io/?https%3A%2F%2Ffedi.buzz%2Fapi%2Fv1%2Fstreaming%2Fpublic");
+
+// The key is with a temp acc
+const evtSource = new EventSource("https://mastodon.social/api/v1/streaming/public?access_token=<?php echo $_ENV['MASTODONSOCIAL_ACCESS_TOKEN']; ?>");
 
 // Main streaming function
 function beginStreaming(filter, lang) {
