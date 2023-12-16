@@ -875,11 +875,10 @@ function beginStreaming(filter, lang) {
 
     // Calculate amount of updates based on the amount of status divs
     var updates = document.querySelectorAll('.status').length;
-    console.log('Updates: ' + updates);
 
     // When there's certain amount of updates, start removing from the top
     // ..and if we're scrolled to bottom
-    if (updates >= 50 && statusesContainer.scrollTop >= statusesContainer.scrollHeight - statusesContainer.offsetHeight) {
+    if (updates >= 30 && statusesContainer.scrollTop >= statusesContainer.scrollHeight - statusesContainer.offsetHeight) {
       document.querySelector('.status:first-child').remove();
     }
 
@@ -938,6 +937,11 @@ function beginStreaming(filter, lang) {
 		// Remove HTML tags and URLs from status content for search purposes
 		var statusText = status.content.replace(/(<([^>]+)>)/g, "").replace(/(?:https?|ftp):\/\/[\n\S]+/g, '');
 
+    // Truncate long statusText
+    if (statusText.length > 200) {
+      statusText = statusText.substring(0, 200) + '...';
+    }
+
 		// Check for filter text in content & that language is either set to "any" or a match
 		if (statusText.toLowerCase().includes(filter) && (lang.toLowerCase() == "any" || status.language.toLowerCase().includes(lang.toLowerCase()))) {
 
@@ -966,6 +970,10 @@ function beginStreaming(filter, lang) {
 
       // Show only image placeholder
       if (status.media_attachments.length != 0) { status.media_attachments = `<span class="text-neutral">[image]</span>`}
+
+      // console.log('Status added: ' + status.content);
+
+      // Render status
 			statusHTML = interpolate(statusTemplate, {status});
 			anchor.insertAdjacentHTML('beforebegin', statusHTML);
 		}
