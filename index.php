@@ -2,6 +2,9 @@
 // Set version
 $version = '1.0.3';
 
+// Set enabled status
+$enabled = false;
+
 // Require composer
 require __DIR__ . '/vendor/autoload.php';
 
@@ -816,6 +819,11 @@ $dotenv->load();
 	</header>
 
 	<div id="statuses">
+    <?php if ( ! $enabled ) : ?>
+      <div style="text-align: center; padding: 20px; display: flex; align-items: center; justify-content: center; height: calc(100vh - 200px);">
+        <p>The feed is shut down. <a href="https://github.com/ronilaukkarinen/fedionfire/issues/8" style="text-decoration: underline;">Read more</a></p>
+      </div>
+    <?php endif; ?>
     <div id="anchor"></div>
 	</div>
 
@@ -1114,7 +1122,9 @@ window.addEventListener('load', function(event) {
     document.getElementById("filter-now").innerHTML += '<span class="text-neutral">(' + lang + ')</span>';
   }
 
-  beginStreaming(filter, lang);
+  <?php if ( $enabled ) : ?>
+    beginStreaming(filter, lang);
+  <?php endif; ?>
 });
 
 // Filter on type without enter, add with push state to URL
@@ -1249,8 +1259,9 @@ document.getElementById("modal-overlay").addEventListener('click', function(even
   document.getElementById("filter-now").focus();
 });
 
-// Add error handling to EventSource
+// Add enabled check to rate limit error handler
 evtSource.onerror = function(event) {
+  <?php if ( $enabled ) : ?>
   // Check if connection is closed or failed
   if (event.target.readyState !== EventSource.OPEN) {
     const popup = document.getElementById('rate-limit-popup');
@@ -1268,6 +1279,7 @@ evtSource.onerror = function(event) {
       beginStreaming(filter, lang);
     }, 30000);
   }
+  <?php endif; ?>
 };
 
 </script>
