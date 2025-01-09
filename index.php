@@ -1,6 +1,6 @@
 <?php
 // Set version
-$version = '1.0.2';
+$version = '1.0.3';
 
 // Require composer
 require __DIR__ . '/vendor/autoload.php';
@@ -527,6 +527,39 @@ $dotenv->load();
         grid-template-columns: 140px 30px 1fr;
       }
     }
+
+    #rate-limit-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ea2429;
+      color: #fff;
+      padding: 16px;
+      border-radius: 4px;
+      z-index: 9999;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    #rate-limit-popup .rate-limit-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #rate-limit-popup p {
+      margin: 0;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
 	</style>
 </head>
 <body>
@@ -762,6 +795,14 @@ $dotenv->load();
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- Rate limit popup -->
+<div id="rate-limit-popup" style="display: none;" role="alert" aria-live="polite">
+  <div class="rate-limit-content">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    <p>Rate limit reached. Please wait a moment...</p>
   </div>
 </div>
 
@@ -1207,6 +1248,27 @@ document.getElementById("modal-overlay").addEventListener('click', function(even
   // Move focus back to filter button
   document.getElementById("filter-now").focus();
 });
+
+// Add error handling to EventSource
+evtSource.onerror = function(event) {
+  // Check if connection is closed or failed
+  if (event.target.readyState !== EventSource.OPEN) {
+    const popup = document.getElementById('rate-limit-popup');
+    popup.style.display = 'block';
+
+    // Hide popup after 5 seconds
+    setTimeout(() => {
+      popup.style.display = 'none';
+    }, 5000);
+
+    // Try to reconnect after 30 seconds
+    setTimeout(() => {
+      // Create new EventSource connection
+      evtSource.close();
+      beginStreaming(filter, lang);
+    }, 30000);
+  }
+};
 
 </script>
 </body>

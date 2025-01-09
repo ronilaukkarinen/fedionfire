@@ -1,3 +1,8 @@
+### 1.0.3: 2025-01-09
+
+* Add rate limit popup
+* Add phpcs.xml
+
 ### 1.0.2: 2023-12-16
 
 * Fix error with filtering by language
